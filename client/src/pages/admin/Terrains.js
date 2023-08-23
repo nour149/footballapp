@@ -81,10 +81,15 @@ const Terrains= () => {
     },
   ];
 
+
+
+  
+
+
   return (
     <Layout>
       <h1 className="text-center m-3">All Terrains</h1>
-      <Table columns={columns} dataSource={terrains} />
+      <Table columns={columns} dataSource={terrains}   rowKey="id" />
     </Layout>
   );
 };

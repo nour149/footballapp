@@ -28,6 +28,8 @@ const Layout = ({ children }) => {
               <hr />
             </div>
             <div className="menu">
+
+{/* key{index}
               {SidebarMenu.map((menu) => {
                 const isActive = location.pathname === menu.path;
                 return (
@@ -38,7 +40,22 @@ const Layout = ({ children }) => {
                     </div>
                   </>
                 );
-              })}
+              })} */}
+
+{
+    SidebarMenu.map((menu, index) => {
+    const isActive = location.pathname === menu.path;
+
+    return (
+      <div key={index} className={`menu-item ${isActive ? "active" : ""}`}>
+        <i className={menu.icon}></i>
+        <Link to={menu.path}>{menu.name}</Link>
+      </div>
+    );
+  })
+}
+
+
               <div className={`menu-item `} onClick={handleLogout}>
                 <i className="fa-solid fa-right-from-bracket"></i>
                 <Link to="/login">Logout</Link>
@@ -48,14 +65,28 @@ const Layout = ({ children }) => {
           <div className="content">
             <div className="header">
               <div className="header-content" style={{ cursor: "pointer" }}>
-                <Badge
+
+
+
+              {/*  length problem
+              <Badge
                   count={user && user.notifcation.length}
                   onClick={() => {
                     navigate("/notification");
                   }}
                 >
                   <i class="fa-solid fa-bell"></i>
-                </Badge>
+                </Badge> */}
+
+
+              <Badge
+  count={user && user.notification ? user.notification.length : 0}
+  onClick={() => {
+    navigate("/notification");
+  }}
+>
+  <i className="fa-solid fa-bell"></i>
+</Badge>
 
                 <Link to="/profile">{user?.name}</Link>
               </div>

@@ -19,7 +19,7 @@ const TerrainList = ({ terrain }) => {
           </p>
          
           <p>
-            <b> équipements_disponibles</b> {terrain. équipements_disponibles}
+            <b> équipements_disponibles</b> {terrain.équipements_disponibles}
           </p>
           <p>
             <b>Timings</b> {terrain.timings[0]} - {terrain.timings[1]}

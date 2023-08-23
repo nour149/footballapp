@@ -2,10 +2,14 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Row } from "antd";
+import { useSelector } from "react-redux";
 import Layout from "./../components/Layout";
 import TerrainList from "../components/TerrainList";
 const HomePage = () => {
   const [terrains, setTerrains] = useState([]);
+  const { user } = useSelector((state) => state.user);
+
+
   // login user data
   const getUserData = async () => {
     try {
@@ -29,12 +33,37 @@ const HomePage = () => {
   useEffect(() => {
     getUserData();
   }, []);
+
+ 
+
+
   return (
     <Layout>
       <h1 className="text-center">Home Page</h1>
-      <Row>
+      {/* <Row>
         {terrains && terrains.map((terrain) => <TerrainList terrain={terrain} />)}
-      </Row>
+      </Row> */}
+
+
+<Row>
+  {terrains && terrains.map((terrain, index) => (
+    <TerrainList key={index} terrain={terrain} />
+  ))}
+</Row>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </Layout>
   );
 };

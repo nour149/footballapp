@@ -66,21 +66,31 @@ const applyTerrainController = async (req, res) => {
   const changeAccountStatusController = async (req, res) => {
     try {
       const { Id, status } = req.body;
+
+     
       const terrain = await terrainModel.findByIdAndUpdate(Id, { status });
-      const user = await userModel.findOne({ _id: terrain.userId });
-      const notifcation = user.notifcation;
-      notifcation.push({
-        type: "doctor-account-request-updated",
-        message: `Your Doctor Account Request Has ${status} `,
-        onClickPath: "/notification",
-      });
-      user.isTerrain = status === "approved" ? true : false;
-      await user.save();
-      res.status(201).send({
-        success: true,
-        message: "Account Status Updated",
-        data: terrain,
-      });
+      console.log(terrain)
+
+      const user = await userModel.findOne({ _id: terrain.userId }); //userId ?????
+    
+      console.log('user',user) /// nulllll
+      
+
+      // const notifcation = user.notifcation;
+      // console.log('user',notifcation)
+
+      // notifcation.push({
+      //   type: "doctor-account-request-updated",
+      //   message: `Your Doctor Account Request Has ${status} `,
+      //   onClickPath: "/notification",
+      // });
+      // user.isTerrain = status === "approved" ? true : false;
+      // await user.save();
+      // res.status(201).send({
+      //   success: true,
+      //   message: "Account Status Updated",
+      //   data: terrain,
+      // });
     } catch (error) {
       console.log(error);
       res.status(500).send({
