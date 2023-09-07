@@ -130,10 +130,9 @@ const adminAppointmentsController = async (req, res) => {
    // });
 
     //await newAdmin.save();
-    const admin = await adminModel.findOne({ userId: req.body.userId });
-    const appointments = await appointmentModel.find({
-      userId: req.body.userId,
-    });
+    // // const admin = await adminModel.findOne({ userId: req.body.userId });
+    const appointments = await appointmentModel.find({ status: 'pending' }).sort({ _id: -1 });
+
     res.status(200).send({
       success: true,
       message: "admin Appointments fetch Successfully",

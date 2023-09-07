@@ -7,6 +7,7 @@ import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
 
+
 const BookingPage = () => {
 const { user } = useSelector((state) => state.user);
  // const [users, setUsers] = useState([]);
@@ -15,9 +16,37 @@ const { user } = useSelector((state) => state.user);
   const [admins, setAdmins] = useState([]);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
+  const [isButtonEnabled, setButtonEnabled] = useState(false);
+
   const [isAvailable, setIsAvailable] = useState();
   const dispatch = useDispatch();
   // login user data
+
+
+
+ const fetchTerrains = async () => {
+  try {
+
+
+    const res = await axios.get(
+      `/api/v1/user/getTerrainById/${params.Id}`,
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    );
+    if (res.data.success) {
+      setTerrains(res.data.data);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+useEffect(() => {
+  fetchTerrains();
+}, []);
   const getUserData = async () => {
     try {
       const res = await axios.post(
@@ -47,6 +76,7 @@ const { user } = useSelector((state) => state.user);
           userId: user._id,
           adminInfo: admins,
           userInfo: user,
+          terrainInfo: terrains,
           date: date,
           time: time,
         },
@@ -66,6 +96,44 @@ const { user } = useSelector((state) => state.user);
     }
   };
 
+  const ckeckBooking = async () => {
+    try {
+   
+      const res = await axios.post(
+        "/api/v1/user/check-appointment",
+        {
+          Id: params.Id,
+
+          terrainInfo: terrains,
+          date: date,
+          time: time,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+ 
+      if (res.data.success) {
+        message.success(res.data.message);
+        setButtonEnabled(true);
+      }else{
+   
+        message.warning(res.data.message)
+        setButtonEnabled(false);
+
+      }
+    } catch (error) {
+    
+      console.log(error);
+    }
+  };
+
+
+
+
+
   useEffect(() => {
     getUserData();
     //eslint-disable-next-line
@@ -73,6 +141,7 @@ const { user } = useSelector((state) => state.user);
   return (
     <Layout>
       <h3>Booking Page</h3>
+
       <div className="container m-2">
         {terrains && (
           <div>
@@ -85,6 +154,7 @@ const { user } = useSelector((state) => state.user);
               {terrains.timings && terrains.timings[1]}{" "}
             </h4>
             <div className="d-flex flex-column w-50">
+              
               <DatePicker
                 className="m-2"
                 format="DD-MM-YYYY"
@@ -97,12 +167,13 @@ const { user } = useSelector((state) => state.user);
                 className="m-2"
                 onChange={(value) => {
                   setTime(moment(value).format("HH:mm"));
+              
                 }}
               />
-              <button className="btn btn-primary mt-2">
+              <button className="btn btn-primary mt-2" onClick={ckeckBooking}>
                 Check Availability
               </button>
-              <button className="btn btn-dark mt-2" onClick={handleBooking}>
+              <button className="btn btn-dark mt-2" onClick={handleBooking} disabled={!isButtonEnabled}>
                 Book Now
               </button>
             </div>

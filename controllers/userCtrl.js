@@ -85,16 +85,27 @@ const authController = async (req, res) => {
 //notification ctrl
 const getAllNotificationController = async (req, res) => {
   try {
+    console.log('req.body.userId', req.body.userId);
     const user = await userModel.findOne({ _id: req.body.userId });
-    const seennotification = user.seennotification;
-    const notification = user.notification;
-    seennotification.push(...notification);
-    user.notification =notification;
-    user.seennotification = notification;
+
+    // Filter unread notifications and mark them as seen
+    const unreadNotifications = user.notification.filter(notification => {
+      if (notification.status === 'NOTREAD') {
+        user.seennotification.push(notification); 
+        return false; 
+      }
+      return true; 
+    });
+
+    unreadNotifications.forEach(notification => {
+      notification.status = 'READ';
+    });
+
+    user.notification = [];
     const updatedUser = await user.save();
     res.status(200).send({
       success: true,
-      message: "all notification marked as read",
+      message: "Unread notifications marked as read and seen",
       data: updatedUser,
     });
   } catch (error) {
@@ -130,8 +141,9 @@ const getAllTerrainsController = async (req, res) => {
 
 //get single terrain
 const getTerrainByIdController = async (req, res) => {
+  const id = req.params.id;
   try {
-    const terrains = await terrainModel.findOne({  });
+    const terrains = await terrainModel.findById(id);
     res.status(200).send({
       success: true,
       message: "Single terrain Info Fetched",
@@ -151,22 +163,28 @@ const getTerrainByIdController = async (req, res) => {
 //BOOK APPOINTMENT
 const bookAppointmentController = async (req, res) => {
   try {
-    req.body.date = moment(req.body.date, "DD-MM-YYYY").toISOString();
-    req.body.time = moment(req.body.time, "HH:mm").toISOString();
+   
+   
     req.body.status = "pending";
     const newAppointment = new appointmentModel(req.body);
     await newAppointment.save();
-    const user = await adminModel.findOne({ _id: req.body.adminInfo?.userId });
-    if (user && user.notification) {
-      user.notification.push({
-        type: "New-appointment-request",
-        message: `A nEw Appointment Request from ${req.body.userInfo.name}`,
-        onCLickPath: "/user/appointments",
-      });
-      await user.save();
-    } else {
-      console.log("Admin user or notification not found.");
-    }
+
+  const all =  await userModel.find({isAdmin:true})
+console.log('alll',all)
+
+try {
+  const useradminnotfi = await userModel.updateMany({isAdmin:true}, {$push: { notification: {
+    type: "New-appointment-request",
+    message: `A nEw Appointment Request from ${req.body.userInfo.name}`,
+    status:'NOTREAD',
+    onCLickPath: "/user/appointments",
+  }}});
+console.log(useradminnotfi)
+} catch (error) {
+  console.error('Error updating documents:', error);
+}
+  
+ 
     res.status(200).send({
       success: true,
       message: "Appointment Book successfully",
@@ -190,7 +208,9 @@ const userAppointmentsController = async (req, res) => {
   try {
     const appointments = await appointmentModel.find({
       userId: req.body.userId,
-    });
+    }).sort({ _id: -1 });
+
+  
     res.status(200).send({
       success: true,
       message: "Users Appointments Fetch SUccessfully",
@@ -207,6 +227,50 @@ const userAppointmentsController = async (req, res) => {
 };
 
 
+
+const CheckAppointmentController = async (req, res) => {
+  try {
+   
+    
+    console.log( req.body.Id)
+   console.log( req.body.time)
+   console.log( req.body.date)
+   const all = await appointmentModel.find({
+    Id:req.body.Id,
+
+    
+  });
+ console.log(all)
+ const filteredArray = all.filter(item => {
+  return item.date === req.body.date && item.time === req.body.time;
+});
+console.log(filteredArray.length)
+  if (filteredArray.length == 0){
+    res.status(200).send({
+      success: true,
+      message: "You Can Booking ",
+   });
+  }else{
+    res.status(200).send({
+      success: false,
+      message: "This terrain is unavailable",
+     
+   });
+  }
+  
+ 
+  
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      error,
+      message: "Error While Booking Appointment",
+    });
+   }
+};
+
+
 module.exports = {
   loginController,
   registerController,
@@ -216,5 +280,6 @@ module.exports = {
   getAllTerrainsController,
   getTerrainByIdController,
   bookAppointmentController,
+  CheckAppointmentController
   
 };

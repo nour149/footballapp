@@ -50,9 +50,26 @@ const AdminAppointments = () => {
   };
 
   const columns = [
+ 
     {
-      title: "ID",
-      dataIndex: "_id",
+      title: "Client Name",
+      dataIndex: "userInfo[0]",
+      render: (text, record) => {
+        if (record.userInfo && record.userInfo.length > 0 && record.userInfo[0].name) {
+          return record.userInfo[0].name;
+        }
+        return "N/A"; 
+      },
+    },
+    {
+      title: "Terrain Info",
+      dataIndex: "terrainInfo[0]",
+      render: (text, record) => {
+        if (record.terrainInfo && record.terrainInfo.length > 0 && record.terrainInfo[0].Name) {
+          return record.terrainInfo[0].Name;
+        }
+        return "N/A"; 
+      },
     },
     {
       title: "Date & Time",
@@ -60,7 +77,7 @@ const AdminAppointments = () => {
       render: (text, record) => (
         <span>
           {moment(record.date).format("DD-MM-YYYY")} &nbsp;
-          {moment(record.time).format("HH:mm")}
+          {'--  '+record.time}
         </span>
       ),
     },
@@ -96,7 +113,15 @@ const AdminAppointments = () => {
   return (
     <Layout>
       <h1>Appoinmtnets Lists</h1>
-      <Table columns={columns} dataSource={appointments} />
+  
+      <Table
+  columns={columns}
+  dataSource={appointments.map((appointment, index) => ({
+    ...appointment,
+    key: index, // or use a unique identifier if available (e.g., appointment._id)
+  }))}/>
+
+
     </Layout>
   );
 };

@@ -8,7 +8,7 @@ const {
   getTerrainByIdController,
   bookAppointmentController,
   userAppointmentsController,
-  
+  CheckAppointmentController
 } = require("../controllers/userCtrl");
 
 const authMiddleware = require("../middlewares/authMiddleware");
@@ -36,10 +36,13 @@ router.post("/get-all-notification",authMiddleware,getAllNotificationController)
 //GET ALL DOC
 router.get("/getAllTerrains", authMiddleware, getAllTerrainsController);
 //POST  GET SINGLE DOC INFO
-router.post("/getTerrainById", authMiddleware,getTerrainByIdController);
+router.get("/getTerrainById/:id", authMiddleware,getTerrainByIdController);
 //BOOK APPOINTMENT
 router.post("/book-appointment", authMiddleware, bookAppointmentController);
 //Appointments List
 router.get("/user-appointments", authMiddleware,  userAppointmentsController);
+
+//Check Appointments
+router.post("/check-appointment", authMiddleware, CheckAppointmentController);
 
 module.exports = router;

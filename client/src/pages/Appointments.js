@@ -27,9 +27,16 @@ const Appointments = () => {
   }, []);
 
   const columns = [
+   
     {
-      title: "ID",
-      dataIndex: "_id",
+      title: "Terrain Info",
+      dataIndex: "terrainInfo[0]",
+      render: (text, record) => {
+        if (record.terrainInfo && record.terrainInfo.length > 0 && record.terrainInfo[0].Name) {
+          return record.terrainInfo[0].Name;
+        }
+        return "N/A"; 
+      },
     },
     // {
     //   title: "Name",
@@ -51,7 +58,7 @@ const Appointments = () => {
       render: (text, record) => (
         <span>
           {moment(record.date).format("DD-MM-YYYY")} &nbsp;
-          {moment(record.time).format("HH:mm")}
+          {'--  '+record.time}
         </span>
       ),
     },
@@ -64,7 +71,10 @@ const Appointments = () => {
   return (
     <Layout>
       <h1>Appoinmtnets Lists</h1>
-      <Table columns={columns} dataSource={appointments} />
+      <Table columns={columns} dataSource={appointments.map(appointment => ({
+  ...appointment,
+  key: appointment._id, // Assign a unique key based on _id
+}))} />
     </Layout>
   );
 };
